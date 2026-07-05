@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TechDesk</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>TechDesk</h1>
+        <div>
+          Connecté en tant que <strong>{{ current_user.username }}</strong> ({{
+          current_user.role }}) —
+          <a href="{{ url_for('main.logout') }}">Se déconnecter</a>
+        </div>
+      </div>
+
+      <a
+        href="{{ url_for('main.nouveau_ticket') }}"
+        class="btn btn-primary mb-4"
+        >+ Nouveau ticket</a
+      >
+
+      <h2 class="mb-3">
+        {% if current_user.role == 'agent' %} Tous les tickets {% else %} Mes
+        tickets {% endif %}
+      </h2>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Catégorie</th>
+            <th>Priorité</th>
+            <th>Statut</th>
+            <th>Créé par</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in tickets %}
+          <tr>
+            <td>{{ ticket.titre }}</td>
+            <td>{{ ticket.categorie }}</td>
+            <td>{{ ticket.priorite }}</td>
+            <td>
+              {% if ticket.statut == 'ouvert' %}
+              <span class="badge bg-danger">ouvert</span>
+              {% elif ticket.statut == 'en_cours' %}
+              <span class="badge bg-warning text-dark">en cours</span>
+              {% else %}
+              <span class="badge bg-success">résolu</span>
+              {% endif %}
+            </td>
+            <td>{{ ticket.createur.username }}</td>
+            <td>
+              <a
+                href="{{ url_for('main.detail_ticket', id=ticket.id) }}"
+                class="btn btn-sm btn-outline-primary"
+                >Voir</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
