@@ -10,6 +10,15 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   </head>
   <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} m-3" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
     <div class="container mt-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>TechDesk</h1>

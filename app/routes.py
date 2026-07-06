@@ -3,6 +3,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, Ticket, Comment
 from sqlalchemy import func
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+
 main = Blueprint('main', __name__)
 @main.route('/')
 @login_required
@@ -56,6 +58,7 @@ def nouveau_ticket():
             user_id=current_user.id  )
         db.session.add(ticket)
         db.session.commit()
+        flash("Commentaire ajoute !", 'success')
 
         return redirect(url_for('main.home'))
 
@@ -90,6 +93,7 @@ def changer_statut(id):
     ticket = Ticket.query.get(id)
     ticket.statut = request.form['statut']
     db.session.commit()
+    flash(f"Statut du ticket mis a jour vers '{ticket.statut}'", 'success')
 
     return redirect(url_for('main.detail_ticket', id=ticket.id))
 @main.route('/dashboard')
