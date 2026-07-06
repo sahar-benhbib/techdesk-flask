@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import User, Ticket, Comment
-
+from sqlalchemy import func
 main = Blueprint('main', __name__)
 @main.route('/')
 @login_required
@@ -92,3 +92,25 @@ def changer_statut(id):
     db.session.commit()
 
     return redirect(url_for('main.detail_ticket', id=ticket.id))
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    if current_user.role != 'agent':
+        return "Acces refuse : reserve aux agents IT", 403
+
+    stats_statut = db.session.query(
+        Ticket.statut, func.count(Ticket.id)
+    ).group_by(Ticket.statut).all()
+
+    stats_categorie = db.session.query(
+        Ticket.categorie, func.count(Ticket.id)
+    ).group_by(Ticket.categorie).all()
+
+    total_tickets = Ticket.query.count()
+
+    return render_template(
+        'dashboard.html',
+        stats_statut=stats_statut,
+        stats_categorie=stats_categorie,
+        total_tickets=total_tickets
+    )

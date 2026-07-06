@@ -25,6 +25,9 @@
         class="btn btn-primary mb-4"
         >+ Nouveau ticket</a
       >
+      {% if current_user.role == 'agent' %}
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary mb-4">Voir le dashboard</a>
+{% endif %}
 
       <h2 class="mb-3">
         {% if current_user.role == 'agent' %} Tous les tickets {% else %} Mes
