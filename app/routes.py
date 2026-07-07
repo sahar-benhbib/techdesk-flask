@@ -9,13 +9,33 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @login_required
 def home():
+    recherche = request.args.get('q', '')
+    filtre_statut = request.args.get('statut', '')
+    filtre_categorie = request.args.get('categorie', '')
+
     if current_user.role == 'agent':
-        tickets = Ticket.query.order_by(Ticket.date_creation.desc()).all()
+        query = Ticket.query
     else:
-        tickets = Ticket.query.filter_by(user_id=current_user.id).order_by(Ticket.date_creation.desc()).all()
+        query = Ticket.query.filter_by(user_id=current_user.id)
 
-    return render_template('home.html', tickets=tickets)
+    if recherche:
+        query = query.filter(Ticket.titre.contains(recherche))
 
+    if filtre_statut:
+        query = query.filter_by(statut=filtre_statut)
+
+    if filtre_categorie:
+        query = query.filter_by(categorie=filtre_categorie)
+
+    tickets = query.order_by(Ticket.date_creation.desc()).all()
+
+    return render_template(
+        'home.html',
+        tickets=tickets,
+        recherche=recherche,
+        filtre_statut=filtre_statut,
+        filtre_categorie=filtre_categorie
+    )
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
